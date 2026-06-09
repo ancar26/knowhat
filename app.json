@@ -26,7 +26,13 @@
       "checkAutomatically": "NEVER"
     },
     "plugins": [
-      "expo-localization"
+      "expo-localization",
+      [
+        "expo-camera",
+        {
+          "cameraPermission": "Allow KnoWhat to access your camera to scan barcodes and photograph product labels."
+        }
+      ]
     ]
   }
 }
