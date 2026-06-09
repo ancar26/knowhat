@@ -38,7 +38,7 @@ You can either take a live photo of a label or pick one from your gallery. Both 
 
 ### Voice readout
 
-Results are read aloud automatically using the device's built-in text-to-speech (expo-speech) in your chosen language. You can stop mid-read, replay the full summary, or trigger voice separately for the ingredients or nutritional notes sections.
+Results are read aloud automatically using **ElevenLabs** (`eleven_multilingual_v2` model) for natural, human-quality speech. The voice style adapts to your chosen tone — friendly voices are more expressive and warm, professional voices are steadier and measured. If ElevenLabs is unavailable the app falls back to the device's built-in TTS transparently. You can stop mid-read, replay the full summary, or trigger voice separately for the ingredients or nutritional notes sections. The voice tone samples in onboarding and profile settings also play through ElevenLabs so you hear the real voice before choosing.
 
 ### Scan history
 
