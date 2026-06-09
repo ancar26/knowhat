@@ -6,8 +6,10 @@ import Onboarding1 from './screens/Onboarding1';
 import Onboarding2 from './screens/Onboarding2';
 import Onboarding3 from './screens/Onboarding3';
 import Scanner from './screens/Scanner';
+import Profile from './screens/Profile';
+import History from './screens/History';
 
-type Screen = 'loading' | 'onboarding1' | 'onboarding2' | 'onboarding3' | 'scanner';
+type Screen = 'loading' | 'onboarding1' | 'onboarding2' | 'onboarding3' | 'scanner' | 'profile' | 'history';
 
 export default function App() {
   const [screen, setScreen] = useState<Screen>('loading');
@@ -37,5 +39,23 @@ export default function App() {
   if (screen === 'onboarding2') return <Onboarding2 profile={profile} onChange={patch} onNext={() => setScreen('onboarding3')} onBack={() => setScreen('onboarding1')} />;
   if (screen === 'onboarding3') return <Onboarding3 profile={profile} onChange={patch} onFinish={finishOnboarding} onBack={() => setScreen('onboarding2')} />;
 
-  return <Scanner profile={profile} />;
+  if (screen === 'profile') return (
+    <Profile
+      profile={profile}
+      onSave={updated => { setProfile(updated); setScreen('scanner'); }}
+      onBack={() => setScreen('scanner')}
+    />
+  );
+
+  if (screen === 'history') return (
+    <History profile={profile} onBack={() => setScreen('scanner')} />
+  );
+
+  return (
+    <Scanner
+      profile={profile}
+      onOpenProfile={() => setScreen('profile')}
+      onOpenHistory={() => setScreen('history')}
+    />
+  );
 }

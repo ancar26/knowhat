@@ -5,17 +5,11 @@ import {
   ActivityIndicator, ScrollView, StyleSheet,
   Text, TouchableOpacity, View,
 } from 'react-native';
+import { Analysis } from '../types/analysis';
 import { LANGUAGES, UserProfile } from '../types/profile';
+import { appendScan } from '../utils/history';
 
 type AppState = 'home' | 'loading' | 'result' | 'error';
-
-type Analysis = {
-  headline: string;
-  summary: string;
-  worthKnowing: string[];
-  ingredients: string[];
-  nutritionalNotes: string;
-};
 
 function parseAnalysis(text: string): Analysis {
   const match = text.match(/\{[\s\S]*\}/);
@@ -96,9 +90,9 @@ async function analyzeLabel(base64Image: string, profile: UserProfile): Promise<
   return parseAnalysis(text);
 }
 
-type Props = { profile: UserProfile };
+type Props = { profile: UserProfile; onOpenProfile: () => void; onOpenHistory: () => void };
 
-export default function Scanner({ profile }: Props) {
+export default function Scanner({ profile, onOpenProfile, onOpenHistory }: Props) {
   const [appState, setAppState] = useState<AppState>('home');
   const [statusMsg, setStatusMsg] = useState('');
   const [analysis, setAnalysis] = useState<Analysis | null>(null);
@@ -115,6 +109,7 @@ export default function Scanner({ profile }: Props) {
     try {
       const result = await analyzeLabel(base64, profile);
       setAnalysis(result);
+      appendScan(result);
       setAppState('result');
       const toSpeak = `${result.headline}. ${result.summary}. ${result.worthKnowing.join('. ')}`;
       setSpeaking(true);
@@ -158,6 +153,14 @@ export default function Scanner({ profile }: Props) {
 
       {appState === 'home' && (
         <View style={styles.home}>
+          <View style={styles.topBar}>
+            <TouchableOpacity style={styles.topBarBtn} onPress={onOpenHistory}>
+              <Text style={styles.topBarBtnText}>🧾 History</Text>
+            </TouchableOpacity>
+            <TouchableOpacity style={styles.topBarBtn} onPress={onOpenProfile}>
+              <Text style={styles.topBarBtnText}>👤 Profile</Text>
+            </TouchableOpacity>
+          </View>
           <Text style={styles.greeting}>
             {profile.name ? `Hi, ${profile.name} 👋` : 'KnoWhat'}
           </Text>
@@ -191,6 +194,14 @@ export default function Scanner({ profile }: Props) {
 
       {appState === 'result' && analysis && (
         <ScrollView contentContainerStyle={styles.resultContainer}>
+          <View style={styles.resultTopBar}>
+            <TouchableOpacity style={styles.topBarBtn} onPress={onOpenHistory}>
+              <Text style={styles.topBarBtnText}>🧾 History</Text>
+            </TouchableOpacity>
+            <TouchableOpacity style={styles.topBarBtn} onPress={onOpenProfile}>
+              <Text style={styles.topBarBtnText}>👤 Profile</Text>
+            </TouchableOpacity>
+          </View>
           <Text style={styles.headline}>{analysis.headline}</Text>
           <View style={styles.card}>
             <Text style={styles.cardText}>{analysis.summary}</Text>
@@ -271,4 +282,16 @@ const styles = StyleSheet.create({
   expandBtnText: { color: '#555', fontSize: 15, fontWeight: '600' },
   inlineVoiceBtn: { marginTop: 14, borderTopWidth: 1, borderTopColor: '#eee', paddingTop: 12, alignItems: 'center' },
   inlineVoiceBtnText: { color: '#2a9d8f', fontWeight: '600', fontSize: 15 },
+  topBar: {
+    position: 'absolute', top: 48, left: 24, right: 24,
+    flexDirection: 'row', justifyContent: 'flex-end', gap: 10,
+  },
+  resultTopBar: {
+    flexDirection: 'row', justifyContent: 'flex-end', gap: 10, marginBottom: 4,
+  },
+  topBarBtn: {
+    paddingHorizontal: 14, paddingVertical: 8, borderRadius: 20,
+    borderWidth: 1.5, borderColor: '#2a9d8f', backgroundColor: 'white',
+  },
+  topBarBtnText: { color: '#2a9d8f', fontWeight: '600', fontSize: 14 },
 });
